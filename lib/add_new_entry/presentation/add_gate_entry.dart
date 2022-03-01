@@ -18,6 +18,7 @@ class AddGateEntryScreen extends StatefulWidget {
 }
 
 class _AddGateEntryScreenState extends State<AddGateEntryScreen> {
+  List<BusinessPartner> l1 = [];
   PickedFile? _imageFile;
   final ImagePicker _picker = ImagePicker();
   final _listItems = ['Raw Material', 'Spares', 'Machines'];
@@ -32,7 +33,7 @@ class _AddGateEntryScreenState extends State<AddGateEntryScreen> {
       ),
       body: BlocListener<AddEntryCubit, AddEntryState>(
         listener: (context, state) => {
-          print("STATE : ${state.isSaved}"),
+          print("RECORD SAVED : ${state.isSaved}"),
           state.isSaved == true
               ? Navigator.of(context).pop(true)
               : ScaffoldMessenger.of(context).showSnackBar(
@@ -44,100 +45,131 @@ class _AddGateEntryScreenState extends State<AddGateEntryScreen> {
                   ),
                 )
         },
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _textEditingController,
-              cursorColor: Theme.of(context).cursorColor,
-              maxLength: 20,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.person),
-                labelText: 'Driver Name',
-                labelStyle: TextStyle(
-                  color: Color(0xFF6200EE),
+        child: BlocListener<BusinessPartnerCubit, FetchBusinessPartnerState>(
+          listener: (context, state) {
+            l1 = state.fetchedBP;
+          },
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _textEditingController,
+                cursorColor: Theme.of(context).cursorColor,
+                maxLength: 20,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.person),
+                  labelText: 'Driver Name',
+                  labelStyle: TextStyle(
+                    color: Color(0xFF6200EE),
+                  ),
                 ),
               ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(20),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton(
-                  isExpanded: true,
-                  elevation: 8,
-                  style: const TextStyle(color: Colors.green, fontSize: 16),
-                  icon: const Icon(Icons.arrow_drop_down_circle),
-                  iconDisabledColor: Colors.red,
-                  iconEnabledColor: Colors.green,
-                  hint: const Text('Transaction Type'),
-                  value: value,
-                  items: _listItems.map((String items) {
-                    return DropdownMenuItem(
-                      value: items,
-                      child: Text(items),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      value = newValue!;
-                    });
-                  },
+              Container(
+                margin: const EdgeInsets.all(20),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton(
+                    isExpanded: true,
+                    elevation: 8,
+                    style: const TextStyle(color: Colors.green, fontSize: 16),
+                    icon: const Icon(Icons.arrow_drop_down_circle),
+                    iconDisabledColor: Colors.red,
+                    iconEnabledColor: Colors.green,
+                    hint: const Text('Transaction Type'),
+                    value: value,
+                    items: _listItems.map((String items) {
+                      return DropdownMenuItem(
+                        value: items,
+                        child: Text(items),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        value = newValue!;
+                      });
+                    },
+                  ),
                 ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    TextButton(
-                      onPressed: () => captureImage(ImageSource.camera),
-                      child: Row(children: const [
-                        Text('Pick Photo'),
-                        Icon(Icons.camera_alt),
-                      ]),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    if (_imageFile != null)
-                      SizedBox(
-                        height: 75,
-                        width: 75,
-                        child: Image(image: FileImage(File(_imageFile!.path))),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      TextButton(
+                        onPressed: () => captureImage(ImageSource.camera),
+                        child: Row(children: const [
+                          Text('Pick Photo'),
+                          Icon(Icons.camera_alt),
+                        ]),
                       )
-                    else
-                      SizedBox(
-                        height: 75,
-                        width: 75,
-                        child: Image.network(
-                            'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif'),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-            FlatButton(
-                onPressed: () async {
-                  _textEditingController.text.isNotEmpty
-                      ? await BlocProvider.of<AddEntryCubit>(context)
-                          .checkRecordSaved(
-                          _textEditingController.text,
-                          value,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      if (_imageFile != null)
+                        SizedBox(
+                          height: 75,
+                          width: 75,
+                          child:
+                              Image(image: FileImage(File(_imageFile!.path))),
                         )
-                      : Fluttertoast.showToast(
-                          msg: "Enter Driver Name",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0,
-                        );
-                },
-                child: const Text('Enter Record')),
-          ],
+                      else
+                        SizedBox(
+                          height: 75,
+                          width: 75,
+                          child: Image.network(
+                              'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif'),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+              FlatButton(
+                  onPressed: () async {
+                    _textEditingController.text.isNotEmpty
+                        ? await BlocProvider.of<AddEntryCubit>(context)
+                            .checkRecordSaved(
+                            _textEditingController.text,
+                            value,
+                            myString,
+                          )
+                        : Fluttertoast.showToast(
+                            msg: "Enter Driver Name",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                  },
+                  child: const Text('Enter Record')),
+              Container(
+                margin: const EdgeInsets.all(20),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    elevation: 8,
+                    style: const TextStyle(color: Colors.green, fontSize: 16),
+                    icon: const Icon(Icons.arrow_drop_down_circle),
+                    iconDisabledColor: Colors.red,
+                    iconEnabledColor: Colors.green,
+                    hint: const Text('Customer Name'),
+                    value: myString,
+                    items: l1.map((item) {
+                      return DropdownMenuItem(
+                          child: Text(item.name!), value: item.id);
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        myString = newValue!;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

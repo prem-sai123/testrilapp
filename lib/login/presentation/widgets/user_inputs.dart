@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:testrilapp/dashboard/presentation/widgets/main_dashboard.dart';
 import 'package:testrilapp/login/presentation/cubit/login_cubit.dart';
@@ -28,8 +29,8 @@ class _UserInputsState extends State<UserInputs> {
   void checkLogin() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? val = preferences.getString('isLoggedIn');
-    print("LOGIN : $val");
     if (val != null) {
+      print("IS USER LOGIN : $val");
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -58,7 +59,9 @@ class _UserInputsState extends State<UserInputs> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BlocProvider(create: (context) => FetchListCubit(),child: const MainDashBoard()),
+              builder: (context) => BlocProvider(
+                  create: (context) => FetchListCubit(),
+                  child: const MainDashBoard()),
             ),
           );
         }
@@ -91,19 +94,43 @@ class _UserInputsState extends State<UserInputs> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 35),
-            child: FloatingActionButton.extended(
-              tooltip: 'Hello',
-              onPressed: () async {
-                await BlocProvider.of<LoginCubit>(context).checkUserExists(
-                    _uNameController!.text, _psWDController!.text);
-              },
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
-              label: const Text('LOGIN'),
-            ),
-          ),
+          BlocBuilder<LoginCubit, LoginCubitState>(builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 35),
+              child: FloatingActionButton.extended(
+                tooltip: 'Hello',
+                onPressed: () async {
+                  await BlocProvider.of<LoginCubit>(context).checkUserExists(
+                      _uNameController!.text, _psWDController!.text);
+                },
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                label: state.isLoading == true
+                    ? SpinKitWave(
+                        itemBuilder: (BuildContext context, int index) {
+                          return DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: index.isEven ? Colors.red : Colors.green,
+                            ),
+                          );
+                        },
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(
+                            Icons.login_sharp,
+                            size: 24.0,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text('LOGIN'), // Text
+                        ],
+                      ),
+              ),
+            );
+          })
         ],
       ),
     );

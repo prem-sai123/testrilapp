@@ -39,7 +39,10 @@ class _DashBoardBodyState extends State<DashBoardBody> {
               MaterialPageRoute(
                 builder: (_) => BlocProvider.value(
                     value: BlocProvider.of<FetchListCubit>(context),
-                    child:  ListViewScreen(prefName: _prefName,prefPass: _prefPass,)),
+                    child: ListViewScreen(
+                      prefName: _prefName,
+                      prefPass: _prefPass,
+                    )),
               ),
             );
           },
@@ -60,7 +63,22 @@ class _DashBoardBodyState extends State<DashBoardBody> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Column(
-                          children: const [Text('Gate Entry')],
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.arrow_circle_up_sharp,
+                                size: 40,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const Text('Gate Entry'),
+                          ],
                         )
                       ],
                     ),
@@ -76,7 +94,6 @@ class _DashBoardBodyState extends State<DashBoardBody> {
             height: 30,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Card(
                   shape: RoundedRectangleBorder(

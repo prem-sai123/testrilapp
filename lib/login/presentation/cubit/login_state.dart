@@ -2,5 +2,6 @@ part of 'login_cubit.dart';
 
 class LoginCubitState {
   bool? loginSuccess;
-  LoginCubitState({this.loginSuccess});
+  bool? isLoading;
+  LoginCubitState({this.loginSuccess,this.isLoading});
 }

@@ -52,7 +52,6 @@ class _RILHomePageState extends State<RILHomePage> {
                     ),
                   ),
                   child: BlocProvider(
-
                       create: (_) => LoginCubit(), child: const UserInputs()),
                 ),
                 const Expanded(child:  Footer())
